@@ -1,6 +1,7 @@
 import pandas as pd
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import json
 
 app = FastAPI()
 
@@ -82,6 +83,7 @@ async def knn_query(query: KnnQuery):
     similar_patients_json = []
     for i in indices:
         similar_patients_json.append(patients[i].model_dump_json())
+    print(similar_patients_json)
     return similar_patients_json
 
 @app.post("/ball_query")
@@ -91,6 +93,11 @@ async def ball_query(query: BallQuery):
     similar_patients_json = []
     for i in indices:
         similar_patients_json.append(patients[i].model_dump_json())
+    try:
+        json.dumps(similar_patients_json)
+    except TypeError:
+        return {"error": "El objeto similar_patients_json no es serializable a JSON"}
+
     return similar_patients_json
    
 @app.get("/patients")
