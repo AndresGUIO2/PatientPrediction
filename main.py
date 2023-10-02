@@ -1,11 +1,41 @@
 import pandas as pd
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI()
+
+# Configuración de CORS
+origins = [
+    "http://localhost",
+    "http://localhost:4200",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 from sklearn.preprocessing import MinMaxScaler
 from kdtree import KDTreeDS, KnnQuery, BallQuery
 from patient import Patient
 import os
 
 app=FastAPI()
+
+origins = [
+    "http://localhost",
+    "http://localhost:4200",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 df = pd.read_csv('data.csv')
 
@@ -46,27 +76,28 @@ new_point = scaler.transform([query_point])
 
 @app.post("/knn_query")
 async def knn_query(query: KnnQuery):
+    print(query)
     query_point = scaler.transform([query.new_point])
     indices, distances = tree.knn_query(query_point, query.k)
     similar_patients_json = []
     for i in indices:
-        similar_patients_json.append(patients[i].dict())
+        similar_patients_json.append(patients[i].model_dump_json())
     return similar_patients_json
 
 @app.post("/ball_query")
 async def ball_query(query: BallQuery):
     query_point = scaler.transform([query.new_point])
-    indices:int = tree.ball_query(query_point, query.radius)
+    indices = tree.ball_query(query_point, query.radius)
     similar_patients_json = []
     for i in indices:
-        similar_patients_json.append(patients[i].dict())
+        similar_patients_json.append(patients[i].model_dump_json())
     return similar_patients_json
    
 @app.get("/patients")
 async def get_patients():
     patients_json = []
     for patient in patients:
-        patients_json.append(patient.to_dict())
+        patients_json.append(patient.model_dump_json())
     return patients_json
     
 if __name__ == "__main__":

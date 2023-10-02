@@ -24,9 +24,12 @@ class KDTreeDS:
 
         return indexes, distances
 
-    def ball_query(self, point: List[float], radius: float) -> List[Tuple[float, List[float], int]]:
-        indexes_list = self.tree.query_ball_point(np.array([point]), radius, p= np.inf)
-        indexes_list = indexes_list.flatten()
-        print(f"Indexes found: {indexes_list}")  #debugging
-        return indexes_list
+    def ball_query(self, point: List[float], radius: float) -> List[ int]:
+        indexes_list = self.tree.query_ball_point(np.array([point]), radius, p= 2)
 
+        inner_list = []
+        if indexes_list:
+            inner_list = indexes_list[0][0] if indexes_list[0] else []
+
+        return inner_list
+        
