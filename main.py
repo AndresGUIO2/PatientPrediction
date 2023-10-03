@@ -9,6 +9,7 @@ app = FastAPI()
 origins = [
     "http://localhost",
     "http://localhost:4200",
+    "https://basefront-ksdp-726nj2kjw-andresguio2.vercel.app"
 ]
 
 app.add_middleware(
